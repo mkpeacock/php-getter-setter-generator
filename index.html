@@ -1,0 +1,76 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <textarea id="code_to_process"></textarea> <br />
+        <button id="generate_button">Generate</button>
+        <textarea id="generated_content"></textarea>
+
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#generate_button').click(function() {
+                    var variables = $("#code_to_process").val();
+                    var getter_string = '    public function get:getter()\n    {\n        return $this->:property;\n    }';
+                    var setter_string = '    public function set:setter(:lower_var)\n    {\n        $this->:property = :lower_var;\n    }';
+                    variables = variables.replace('!/\*.*?\*/!s', '');
+                    variables = variables.replace('/\n\s*\n/', "\n");
+                    variables = variables.replace("\n", "");
+                    variables = variables.replace("\r", "");
+                    variables = variables.replace("\t", "");
+                    variables = variables.replace("\n", "");
+                    variables = variables.replace("private", "");
+                    variables = variables.replace("public ", "");
+                    variables = variables.replace("protected ", "");
+                    variables = variables.replace("static ", "");
+                    variables = variables.replace("var ", "");
+                    variables = variables.replace(" ", "");
+                    variables = variables.replace("$", "");
+
+                    variables = variables.split(';');
+
+                    for (var i = 0; i < variables.length; i++) {
+                        if ("" != variables[i]) {
+                            variable = variables[i].split('=');
+                            variable = variable[0];
+
+                            var getter = variable.charAt(0).toUpperCase() + variable.slice(1);
+
+                            $("#generated_content").val( $("#generated_content").val() + getter_string.replace(':getter', getter).replace(':property', variable) + "\n");
+
+
+                        }
+                    }
+
+                    for (var i = 0; i < variables.length; i++) {
+                        if ("" != variables[i]) {
+                            variable = variables[i].split('=');
+                            variable = variable[0];
+
+                            var setter = variable.charAt(0).toUpperCase() + variable.slice(1);
+                            var lower_var = variable.replace('/[A-Z]*/', function(c) {
+                                return '_' + c;
+                            });
+
+                            lower_var = lower_var.toLowerCase();
+
+
+                            $("#generated_content").val( $("#generated_content").val() + setter_string.replace(':setter', setter).replace(':lower_var', lower_var).replace(':property', variable) + "\n");
+
+
+                        }
+                    }
+
+    //$replacements = array( "\n" => "", "\r" => "", "\t" => "",  "private" => "", "public" => "", "protected" => "", "var" => "", " " => "", "$" => "" );
+   // $variables = str_replace(array_keys($replacements), array_values($replacements), $variables );
+   // $variables = explode( ";", $variables );
+
+
+                    //$('#generated_content').html(variables);
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>
